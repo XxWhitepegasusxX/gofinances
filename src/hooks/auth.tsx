@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react'
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import * as AuthSession from 'expo-auth-session';
 import * as AppleAuthentication from 'expo-apple-authentication'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +15,8 @@ interface IAuthContextData{
     user: User;
     signInWithGoogle(): Promise<void>;
     signInWithApple(): Promise<void>;
+    signOut(): Promise<void>;
+    userStorageLoading: boolean;
 }
 
 interface AuthProviderProps {
@@ -78,7 +80,7 @@ function AuthProvider({children}: AuthProviderProps){
                     id: String(credential.user),
                     email: credential.email!,
                     name: credential.fullName!.givenName!,
-                    photo: undefined,
+                    photo: `https://ui-avatars.com/api/?name=${credential.fullName!.givenName}&length=1`,
                 };
                 setUser(userLogged)
                 await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged))
@@ -88,8 +90,27 @@ function AuthProvider({children}: AuthProviderProps){
         }
     }
 
+    async function signOut(){
+        setUser({} as User);
+        await AsyncStorage.removeItem(userStorageKey)
+    }
+
+    useEffect(() => {
+        async function loadUserStorageData(){
+            const userStoraged = await AsyncStorage.getItem(userStorageKey)
+
+            if(userStoraged){
+                const userLogged = JSON.parse(userStoraged) as User;
+                setUser(userLogged)
+            }
+            setUserStorageLoading(false)
+        }
+
+        loadUserStorageData()
+    }, [])
+
     return(
-        <AuthContext.Provider value={{ user, signInWithGoogle, signInWithApple }}>
+        <AuthContext.Provider value={{ user, signInWithGoogle, signInWithApple, signOut, userStorageLoading }}>
             {children}
         </AuthContext.Provider>
     )

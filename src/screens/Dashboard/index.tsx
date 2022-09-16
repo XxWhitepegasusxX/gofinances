@@ -7,6 +7,7 @@ import { Transactions, Title, HighlightCards, Icon, UserWrapper, Container, Head
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../hooks/auth';
 
 export interface DataListProps extends TransactionCardProps {
   id: string;
@@ -27,6 +28,7 @@ export function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [transactions, setTransactions] = useState<DataListProps[]>([])
   const [highLightData, setHighLightData] = useState<HighlightData>({} as HighlightData)
+  const { signOut, user } = useAuth()
   
   function getLastTransactionDate(collection: DataListProps[], type: 'positive' | 'negative'){
     const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -126,13 +128,13 @@ export function Dashboard() {
       <Header>
         <UserWrapper>
           <UserInfo>
-            <Photo source={{ uri: 'https://avatars.githubusercontent.com/u/94650815?v=4'}}/>
+            <Photo source={{ uri: user.photo}}/>
             <User>
               <UserGreeting>Olá, </UserGreeting>
-              <UserName>Alexander</UserName>
+              <UserName>{user.name}</UserName>
             </User>
           </UserInfo>
-          <LogoutButton onPress={() => {}}>
+          <LogoutButton onPress={signOut}>
             <Icon name='power'/>
           </LogoutButton>
         </UserWrapper>
