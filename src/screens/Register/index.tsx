@@ -14,6 +14,7 @@ import { CategorySelectButton } from "../../components/Forms/CategorySelectButto
 
 import { CategorySelect } from "../CategorySelect"
 import { InputForm } from "../../components/Forms/InputForm";
+import { useAuth } from "../../hooks/auth";
 
 interface FormData{
     name: string,
@@ -26,7 +27,8 @@ const schema = Yup.object().shape({
 })
 
 export function Register(){
-    const dataKey = "@gofinances:transactions";
+    const { user } = useAuth()
+    const dataKey = `@gofinances:transactions_user:${user.id}`;
     const [ category, setCategory] = useState({
         key: 'category',
         name: 'Categoria',
@@ -107,8 +109,8 @@ export function Register(){
                         <InputForm error={errors.name && errors.name.message} autoCapitalize="sentences" autoCorrect={false} control={control} name="name" placeholder="Nome" />
                         <InputForm error={errors.amount && errors.amount.message} keyboardType="numeric" control={control} name="amount" placeholder="Preço" />
                     <TransactionsTypes>
-                        <TransactionTypeButton isActive={transactionType === 'positive'} onPress={() => handleTransactionsTypeSelect('positive')} title="Income" type="up" />
-                        <TransactionTypeButton isActive={transactionType === 'negative'} onPress={() => handleTransactionsTypeSelect('negative')} title="Outcome" type="down" />
+                        <TransactionTypeButton isActive={transactionType === 'positive'} onPress={() => handleTransactionsTypeSelect('positive')} title="Entrada" type="up" />
+                        <TransactionTypeButton isActive={transactionType === 'negative'} onPress={() => handleTransactionsTypeSelect('negative')} title="Saída" type="down" />
                     </TransactionsTypes>
                     <CategorySelectButton title={category.name} onPress={handleOpenSelectCategory}/>
                     </Fields>
